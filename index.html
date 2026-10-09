@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABRIJA RENT CAR</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#080d16;color:white}
+header{padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:#0d1422;border-bottom:1px solid #183d6c}
+.logo{font-size:22px;font-weight:900;letter-spacing:1px}
+.logo span{color:#238cff}
+nav a{color:white;text-decoration:none;margin-left:20px}
+button,.btn{background:#1678ed;color:white;border:0;padding:12px 18px;border-radius:7px;cursor:pointer;font-weight:bold;text-decoration:none}
+.hero{padding:85px 7%;background:linear-gradient(90deg,#080d16 15%,#08162acc),url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80') center/cover}
+.hero p{color:#55aaff;letter-spacing:3px}
+h1{font-size:clamp(38px,6vw,68px);margin:15px 0}
+.hero h1 span{color:#238cff}
+.hero .sub{color:#d0d8e5;max-width:530px;line-height:1.7}
+section{padding:55px 7%}
+.section-title{text-align:center;margin-bottom:30px}
+.section-title p{color:#238cff}
+.cars{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.card{background:#111b2b;border:1px solid #1b304d;border-radius:12px;overflow:hidden}
+.card img{width:100%;height:185px;object-fit:cover}
+.info{padding:18px}
+.info p{color:#aebdd0}
+.price{font-size:25px;font-weight:bold;color:#55aaff;margin:15px 0}
+.price small{font-size:14px;color:#aebdd0}
+.contact{background:#0d1422}
+form{max-width:550px;margin:auto;display:grid;gap:12px}
+input,select,textarea{padding:13px;border-radius:6px;border:1px solid #29405d;background:#101b2b;color:white;width:100%}
+footer{text-align:center;padding:25px;color:#9caec5;background:#060910}
+#admin{display:none;background:#101a2b;padding:25px 7%;border-top:2px solid #238cff}
+#admin input{margin:5px 0}
+.admin-row{border-bottom:1px solid #34445c;padding:12px 0}
+.small{font-size:13px;color:#9caec5}
+@media(max-width:650px){header{padding:18px 5%;flex-wrap:wrap;gap:15px}nav a{margin:0 10px 0 0;font-size:14px}.hero{padding:65px 5%}section{padding:45px 5%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">ABRIJA <span>RENT CAR</span></div>
+  <nav><a href="#home">Kryefaqja</a><a href="#cars">Makinat</a><a href="#contact">Kontakt</a></nav>
+  <a class="btn" href="#cars">Shiko makinat</a>
+</header>
+
+<div class="hero" id="home">
+  <p>PREMIUM CAR RENTAL</p>
+  <h1>Udhëto me stil.<br><span>Zgjidh makinën tënde.</span></h1>
+  <div class="sub">Mirë se vini te ABRIJA RENT CAR. Zgjidh makinën për udhëtimin tënd dhe na kontakto për rezervim.</div>
+  <br><a class="btn" href="#cars">Eksploro makinat →</a>
+</div>
+
+<section id="cars">
+  <div class="section-title"><p>FLOTA JONË</p><h2>Makinat me qira</h2></div>
+  <div class="cars" id="carList"></div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="section-title"><p>NA KONTAKTO</p><h2>Kërko një rezervim</h2></div>
+  <form id="booking">
+    <input id="customer" placeholder="Emri yt" required>
+    <input id="phone" placeholder="Numri yt i telefonit" required>
+    <select id="chosenCar" required><option value="">Zgjidh makinën</option></select>
+    <label>Data e marrjes së makinës</label>
+    <input id="date" type="date" required>
+    <textarea id="message" placeholder="Mesazh shtesë"></textarea>
+    <button type="submit">Dërgo kërkesën në WhatsApp</button>
+    <p class="small">Pronari duhet të konfirmojë disponueshmërinë dhe çmimin.</p>
+  </form>
+</section>
+
+<section id="admin">
+  <h2>Paneli i administrimit</h2>
+  <p class="small">Version prove në këtë pajisje. Ndryshimet ruhen në shfletuesin tënd.</p>
+  <h3>Shto një makinë</h3>
+  <input id="newName" placeholder="Emri i makinës">
+  <input id="newPrice" type="number" placeholder="Çmimi për ditë (€)">
+  <input id="newImage" placeholder="Linku i fotos së makinës">
+  <button onclick="addCar()">+ Shto makinën</button>
+  <h3>Ndrysho kontaktin</h3>
+  <input id="newPhone" placeholder="Numri WhatsApp me kodin e shtetit">
+  <button onclick="savePhone()">Ruaj numrin</button>
+  <h3>Flota</h3>
+  <div id="manageList"></div>
+</section>
+
+<footer>
+  <div class="logo">ABRIJA <span>RENT CAR</span></div>
+  <p>© 2026 ABRIJA RENT CAR</p>
+  <button onclick="adminLogin()">Administrimi</button>
+</footer>
+
+<script>
+const defaults = [
+ {name:"Mercedes-Benz E-Class",price:50,image:"https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=900&q=80"},
+ {name:"BMW Seria 5",price:60,image:"https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80"},
+ {name:"Audi A6",price:45,image:"https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=900&q=80"}
+];
+let cars;
+try { cars=JSON.parse(localStorage.getItem("abrijaCars")) || defaults; }
+catch(e){cars=defaults;}
+let wa=localStorage.getItem("abrijaPhone") || "";
+
+function saveCars(){
+ localStorage.setItem("abrijaCars",JSON.stringify(cars));
+ render();
+}
+function render(){
+ document.getElementById("carList").innerHTML=cars.map((c,i)=>`
+ <article class="card">
+ <img src="${escapeAttr(c.image)}" alt="${escapeAttr(c.name)}">
+ <div class="info"><h3>${escapeHtml(c.name)}</h3>
+ <p>Kontakto për disponueshmërinë</p>
+ <div class="price">${Number(c.price)}€ <small>/ dita</small></div>
+ <button onclick="selectCar(${i})">Rezervo makinën</button></div></article>`).join("");
+ document.getElementById("chosenCar").innerHTML='<option value="">Zgjidh makinën</option>'+cars.map(c=>`<option>${escapeHtml(c.name)}</option>`).join("");
+ document.getElementById("manageList").innerHTML=cars.map((c,i)=>`<div class="admin-row"><b>${escapeHtml(c.name)}</b> — ${Number(c.price)}€ / dita <button onclick="removeCar(${i})">Hiq</button></div>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escapeAttr(s){return escapeHtml(s);}
+function selectCar(i){document.getElementById("chosenCar").value=cars[i].name;document.getElementById("contact").scrollIntoView({behavior:"smooth"});}
+function adminLogin(){
+ if(prompt("Shkruaj kodin e provës për panelin:")!=="1234"){alert("Kodi nuk është i saktë.");return;}
+ document.getElementById("admin").style.display="block";
+ document.getElementById("admin").scrollIntoView({behavior:"smooth"});
+}
+function addCar(){
+ let name=document.getElementById("newName").value.trim();
+ let price=Number(document.getElementById("newPrice").value);
+ let image=document.getElementById("newImage").value.trim();
+ if(!name||price<=0||!image){alert("Plotëso emrin, çmimin dhe linkun e fotos.");return;}
+ cars.push({name,price,image});saveCars();
+ document.getElementById("newName").value="";
+ document.getElementById("newPrice").value="";
+ document.getElementById("newImage").value="";
+}
+function removeCar(i){if(confirm("Ta heqim këtë makinë?")){cars.splice(i,1);saveCars();}}
+function savePhone(){
+ wa=document.getElementById("newPhone").value.replace(/\D/g,"");
+ localStorage.setItem("abrijaPhone",wa);
+ alert("Numri u ruajt në këtë shfletues.");
+}
+document.getElementById("booking").addEventListener("submit",e=>{
+ e.preventDefault();
+ if(!wa){alert("Pronari duhet të vendosë numrin WhatsApp në panelin e administrimit.");return;}
+ let text="Përshëndetje ABRIJA RENT CAR! Dua të kërkoj një rezervim.%0A"+
+ "Emri: "+encodeURIComponent(document.getElementById("customer").value)+
+ "%0ATelefoni: "+encodeURIComponent(document.getElementById("phone").value)+
+ "%0AMakina: "+encodeURIComponent(document.getElementById("chosenCar").value)+
+ "%0AData: "+encodeURIComponent(document.getElementById("date").value)+
+ "%0AMesazhi: "+encodeURIComponent(document.getElementById("message").value);
+ window.open("https://wa.me/"+wa+"?text="+text,"_blank");
+});
+render();
+</script>
+</body>
+</html>
